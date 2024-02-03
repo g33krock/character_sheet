@@ -1,106 +1,100 @@
-const classes = {
-  Wizard: {
-    abilities: [
-      { strength: 8 },
-      { dexterity: 10 },
-      { constitution: 10 },
-      { intelligence: 18 },
-      { wisdom: 16 },
-      { charisma: 14 },
-    ],
-    skills: [
-      { Fireball: [{ damage: "1d6 + 2" }, { range: 30 }] },
-      { Frostbolt: [{ damage: "1d8" }, { range: 30 }] },
-    ],
-  },
-  Fighter: {
-    abilities: [
-      { strength: 18 },
-      { dexterity: 14 },
-      { constitution: 16 },
-      { intelligence: 8 },
-      { wisdom: 10 },
-      { charisma: 10 },
-    ],
-    skills: [
-      { Strike: [{ damage: "1d6 + 2" }, { range: 1 }] },
-      { Pummel: [{ damage: "1d8" }, { range: 1 }] },
-    ],
-  },
-  Rogue: {
-    abilities: [
-      { strength: 10 },
-      { dexterity: 18 },
-      { constitution: 10 },
-      { intelligence: 10 },
-      { wisdom: 14 },
-      { charisma: 16 },
-    ],
-    skills: [
-      { Stab: [{ damage: "1d6 + 2" }, { range: 1 }] },
-      { Poison: [{ damage: "1d8" }, { range: 1 }] },
-    ],
-  },
-};
+import { skills } from './skills.js';
 
-document.getElementById('classSelector').addEventListener('change', function() {
-    const selectedClass = this.value;
-    const abilitiesList = document.getElementById('abilities');
-    const skillsList = document.getElementById('skills');
+function createSkillsTable(skills) {
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+    const headerRow = document.createElement('tr');
 
-    // Clear existing entries
-    abilitiesList.innerHTML = '';
-    skillsList.innerHTML = '';
+    // Determine the total number of categories
+    const totalCategories = Object.keys(skills).length;
 
-    if (selectedClass) {
-        // Populate abilities with input fields for adjustment
-        classes[selectedClass].abilities.forEach(abilityObj => {
-            Object.entries(abilityObj).forEach(([ability, value]) => {
-                const li = document.createElement('li');
-                const label = document.createElement('label');
-                label.textContent = `${ability.toUpperCase()}: `;
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.value = value;
-                label.appendChild(input);
-                li.appendChild(label);
-                abilitiesList.appendChild(li);
-            });
-        });
+    // Create main category headers
+    Object.keys(skills).forEach(skillCategory => {
+        const th = document.createElement('th');
+        th.textContent = skillCategory;
+        headerRow.appendChild(th);
+    });
 
-        // Populate skills with checkboxes and add event listeners
-        classes[selectedClass].skills.forEach(skillObj => {
-            Object.entries(skillObj).forEach(([skill, attributes]) => {
-                const li = document.createElement('li');
-                const label = document.createElement('label');
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(` ${skill}: `));
-                li.appendChild(label);
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
 
-                // Create a span to hold the damage and range values
-                const detailsSpan = document.createElement('span');
-                attributes.forEach(attrObj => {
-                    Object.entries(attrObj).forEach(([attr, value]) => {
-                        const detailText = document.createTextNode(`${attr} ${value}, `);
-                        detailsSpan.appendChild(detailText);
-                    });
-                });
-                // Remove the trailing comma and space from the detailsSpan text
-                detailsSpan.textContent = detailsSpan.textContent.slice(0, -2);
-                detailsSpan.style.display = 'none'; // Initially hide the details
-                li.appendChild(detailsSpan);
-
-                // Add an event listener to the checkbox
-                checkbox.addEventListener('change', function() {
-                    // Toggle the display of the details based on the checkbox state
-                    detailsSpan.style.display = this.checked ? 'inline' : 'none';
-                });
-
-                skillsList.appendChild(li);
-            });
-        });
+    // Function to toggle visibility
+    function toggleVisibility(row) {
+        row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
     }
-});
 
+    // Create subheading row for Traits that spans all columns
+    const traitsSubheadingRow = document.createElement('tr');
+    const traitsSubheading = document.createElement('th');
+    traitsSubheading.textContent = 'Traits';
+    traitsSubheading.colSpan = totalCategories;
+    traitsSubheading.classList.add('subheading'); 
+    traitsSubheading.onclick = () => toggleVisibility(traitsRow);
+    traitsSubheadingRow.appendChild(traitsSubheading);
+    tbody.appendChild(traitsSubheadingRow);
+
+    // Create and append traits rows
+    const traitsRow = document.createElement('tr');
+    traitsRow.style.display = 'none';
+    Object.values(skills).forEach(category => {
+        const td = document.createElement('td');
+        const traitsList = document.createElement('ul');
+
+        category.traits.forEach(trait => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${trait.name}</strong> <br> ${trait.description}`;
+            traitsList.appendChild(li);
+        });
+
+        td.appendChild(traitsList);
+        traitsRow.appendChild(td);
+    });
+    tbody.appendChild(traitsRow);
+
+    // Create subheading row for Enhancements that spans all columns
+    const enhancementsSubheadingRow = document.createElement('tr');
+    const enhancementsSubheading = document.createElement('th');
+    enhancementsSubheading.textContent = 'Enhancements';
+    enhancementsSubheading.colSpan = totalCategories;
+    enhancementsSubheading.classList.add('subheading');
+    enhancementsSubheading.onclick = () => toggleVisibility(enhancementsRow); 
+    enhancementsSubheadingRow.appendChild(enhancementsSubheading);
+    tbody.appendChild(enhancementsSubheadingRow);
+
+    // Create and append enhancements rows
+    const enhancementsRow = document.createElement('tr');
+    Object.values(skills).forEach(category => {
+        const td = document.createElement('td');
+        const enhancementsList = document.createElement('ul');
+
+        category.enhancements.forEach(enhancement => {
+            const li = document.createElement('li');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = enhancement.name.toLowerCase().replace(/ /g, '-');
+            checkbox.name = enhancement.name;
+
+            const label = document.createElement('label');
+            label.innerHTML = `<strong>${enhancement.name}</strong>: ${enhancement.credits}sc<br><strong>Description</strong>: ${enhancement.description}`;
+
+            li.appendChild(checkbox);
+            li.appendChild(label);
+            enhancementsList.appendChild(li);
+        });
+
+        td.appendChild(enhancementsList);
+        enhancementsRow.appendChild(td);
+    });
+    tbody.appendChild(enhancementsRow);
+
+    // Append thead and tbody to table
+    table.appendChild(thead);
+    table.appendChild(tbody);
+
+    // Append the table to the div with id 'skillsTable'
+    document.getElementById('skillsTable').appendChild(table);
+}
+
+
+createSkillsTable(skills);

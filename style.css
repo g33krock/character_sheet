@@ -1,47 +1,58 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    padding: 20px;
-}
-
-#characterSheet {
-    max-width: 600px;
-    margin: auto;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-#classSelector {
+/* Table base styles */
+table {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 30px;
-    border-radius: 4px;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    vertical-align: top; /* Aligns content to the top of the cell */
     border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
 }
 
-h2 {
+th {
+    background-color: #f2f2f2;
     color: #333;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
 }
 
+/* Zebra striping for rows */
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Styling for list items */
 ul {
-    list-style-type: none;
-    padding: 0;
-    margin-bottom: 20px;
+    list-style-type: none; /* Removes the default list item bullet */
+    padding: 0; /* Removes the default padding */
 }
 
 li {
-    background-color: #fafafa;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border-left: 4px solid #007bff;
+    padding: 5px; /* Adds some padding to each list item */
+    border-bottom: 1px solid #eee; /* Adds a subtle line between items */
 }
 
 li:last-child {
-    margin-bottom: 0;
+    border-bottom: none; /* Removes the border from the last item */
 }
 
+/* Checkbox and label styling */
+input[type="checkbox"] {
+    margin-right: 10px; /* Adds some space between the checkbox and its label */
+}
+
+label {
+    display: block; /* Makes the label take up the full width, helping with alignment */
+    cursor: pointer; /* Changes the cursor to a pointer when hovering over the label */
+}
+
+/* Hover effects for rows */
+tr:hover {
+    background-color: #e8f4ff; /* Adds a highlight effect on row hover */
+}
+
+th.subheading {
+    text-align: center; /* Centers the text for subheadings */
+    cursor: pointer;
+}
