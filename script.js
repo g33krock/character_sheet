@@ -1,6 +1,20 @@
 import { skills } from './skills.js';
 
+let maxHP = 100; // Initialize maxHP to 100
+
 function createSkillsTable(skills) {
+    // HP Input Field
+    const hpLabel = document.createElement('label');
+    hpLabel.setAttribute('for', 'hpInput');
+    hpLabel.textContent = 'Hit Points';
+    const hpInput = document.createElement('input');
+    hpInput.type = 'number';
+    hpInput.id = 'hpInput';
+    hpInput.value = maxHP; // Set the default value to maxHP
+    const skillsTableDiv = document.getElementById('skillsTable');
+    document.body.insertBefore(hpLabel, skillsTableDiv);
+    document.body.insertBefore(hpInput, skillsTableDiv);
+
     const table = document.createElement('table');
     const thead = document.createElement('thead');
     const tbody = document.createElement('tbody');
@@ -8,9 +22,10 @@ function createSkillsTable(skills) {
 
     const bonusTotals = {}; // Object to store total bonuses for each category
 
-    // Create main category headers with bonus totals
+    // Create main category headers
     Object.keys(skills).forEach(skillCategory => {
         const th = document.createElement('th');
+        th.textContent = skillCategory;
         const title = document.createTextNode(skillCategory + ' ');
         const bonusSpan = document.createElement('span'); // Span to display the bonus total
         bonusSpan.id = `bonus-${skillCategory}`;
@@ -91,6 +106,12 @@ function createSkillsTable(skills) {
 
                 // Update the display for the bonus total in the header
                 document.getElementById(`bonus-${currentCategory}`).textContent = `(Bonus: ${bonusTotals[currentCategory]})`;
+
+                if (category === skills['Vitality']) {
+                    // Update maxHP and HP input field for Vitality enhancements
+                    maxHP += this.checked ? enhancement.bonus : -enhancement.bonus;
+                    hpInput.value = maxHP;
+                }
             });
 
             li.appendChild(checkbox);
