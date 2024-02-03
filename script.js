@@ -6,14 +6,21 @@ function createSkillsTable(skills) {
     const tbody = document.createElement('tbody');
     const headerRow = document.createElement('tr');
 
-    // Determine the total number of categories
-    const totalCategories = Object.keys(skills).length;
+    const bonusTotals = {}; // Object to store total bonuses for each category
 
-    // Create main category headers
+    // Create main category headers with bonus totals
     Object.keys(skills).forEach(skillCategory => {
         const th = document.createElement('th');
-        th.textContent = skillCategory;
+        const title = document.createTextNode(skillCategory + ' ');
+        const bonusSpan = document.createElement('span'); // Span to display the bonus total
+        bonusSpan.id = `bonus-${skillCategory}`;
+        bonusSpan.textContent = '(Bonus: 0)'; // Initialize bonus total display
+
+        th.appendChild(title);
+        th.appendChild(bonusSpan);
         headerRow.appendChild(th);
+
+        bonusTotals[skillCategory] = 0; // Initialize bonus total for this category
     });
 
     thead.appendChild(headerRow);
@@ -28,22 +35,21 @@ function createSkillsTable(skills) {
     const traitsSubheadingRow = document.createElement('tr');
     const traitsSubheading = document.createElement('th');
     traitsSubheading.textContent = 'Traits';
-    traitsSubheading.colSpan = totalCategories;
-    traitsSubheading.classList.add('subheading'); 
+    traitsSubheading.colSpan = Object.keys(skills).length;
+    traitsSubheading.classList.add('subheading');
     traitsSubheading.onclick = () => toggleVisibility(traitsRow);
     traitsSubheadingRow.appendChild(traitsSubheading);
     tbody.appendChild(traitsSubheadingRow);
 
-    // Create and append traits rows
     const traitsRow = document.createElement('tr');
-    traitsRow.style.display = 'none';
+    traitsRow.style.display = 'none'; // Initially hidden
     Object.values(skills).forEach(category => {
         const td = document.createElement('td');
         const traitsList = document.createElement('ul');
 
         category.traits.forEach(trait => {
             const li = document.createElement('li');
-            li.innerHTML = `<strong>${trait.name}</strong> <br> ${trait.description}`;
+            li.innerHTML = `<strong>${trait.name}</strong><br>${trait.description}`;
             traitsList.appendChild(li);
         });
 
@@ -56,15 +62,15 @@ function createSkillsTable(skills) {
     const enhancementsSubheadingRow = document.createElement('tr');
     const enhancementsSubheading = document.createElement('th');
     enhancementsSubheading.textContent = 'Enhancements';
-    enhancementsSubheading.colSpan = totalCategories;
+    enhancementsSubheading.colSpan = Object.keys(skills).length;
     enhancementsSubheading.classList.add('subheading');
-    enhancementsSubheading.onclick = () => toggleVisibility(enhancementsRow); 
+    enhancementsSubheading.onclick = () => toggleVisibility(enhancementsRow);
     enhancementsSubheadingRow.appendChild(enhancementsSubheading);
     tbody.appendChild(enhancementsSubheadingRow);
 
-    // Create and append enhancements rows
     const enhancementsRow = document.createElement('tr');
-    Object.values(skills).forEach(category => {
+    enhancementsRow.style.display = 'none'; // Initially hidden
+    Object.values(skills).forEach((category, columnIndex) => {
         const td = document.createElement('td');
         const enhancementsList = document.createElement('ul');
 
@@ -72,11 +78,20 @@ function createSkillsTable(skills) {
             const li = document.createElement('li');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.id = enhancement.name.toLowerCase().replace(/ /g, '-');
-            checkbox.name = enhancement.name;
-
             const label = document.createElement('label');
-            label.innerHTML = `<strong>${enhancement.name}</strong>: ${enhancement.credits}sc<br><strong>Description</strong>: ${enhancement.description}`;
+            label.innerHTML = `<strong>${enhancement.name}</strong>: ${enhancement.credits}sc (Bonus: ${enhancement.bonus})<br><strong>Description</strong>: ${enhancement.description}`;
+
+            // Event listener for checkbox
+            checkbox.addEventListener('change', function() {
+                const categoryKeys = Object.keys(skills); // Get category names
+                const currentCategory = categoryKeys[columnIndex]; // Get the current category name
+
+                // Update the bonus total based on checkbox state
+                bonusTotals[currentCategory] += this.checked ? enhancement.bonus : -enhancement.bonus;
+
+                // Update the display for the bonus total in the header
+                document.getElementById(`bonus-${currentCategory}`).textContent = `(Bonus: ${bonusTotals[currentCategory]})`;
+            });
 
             li.appendChild(checkbox);
             li.appendChild(label);
@@ -88,13 +103,10 @@ function createSkillsTable(skills) {
     });
     tbody.appendChild(enhancementsRow);
 
-    // Append thead and tbody to table
-    table.appendChild(thead);
     table.appendChild(tbody);
 
     // Append the table to the div with id 'skillsTable'
     document.getElementById('skillsTable').appendChild(table);
 }
-
 
 createSkillsTable(skills);
